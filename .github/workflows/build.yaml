@@ -1,43 +1,45 @@
-name: flask-helloworld
+name: flask-helloworld  # Tên workflow
+
 on:
   push:
-    branches: [ master ]
+    branches: [ master ]  # Kích hoạt workflow khi có push lên nhánh master
+
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Chạy trên môi trường Ubuntu mới nhất
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v4  # Cập nhật lên v4 để tương thích mới nhất
 
-      - name: Login Docker Hub
-        uses: docker/login-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3  # Cập nhật lên v3 để ổn định hơn
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  # Tên tài khoản Docker Hub
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # Token để xác thực
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        id: buildx
+        uses: docker/setup-buildx-action@v3  # Cập nhật lên v3 để ổn định hơn
+        id: buildx  # Định danh cho bước này
 
       - name: Cache Docker Image Layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3  # Cập nhật lên v3 để tránh lỗi thiếu download info
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          path: /tmp/.buildx-cache  # Đường dẫn lưu cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}  # Tạo cache key theo commit SHA
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-buildx-  # Phục hồi cache nếu có sẵn
 
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v2
-        id: docker_build
+        uses: docker/build-push-action@v5  # Cập nhật lên v5
+        id: docker_build  # Định danh bước này
         with:
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask-helloworld
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          context: ./  # Sử dụng thư mục hiện tại làm context
+          file: ./Dockerfile  # Đường dẫn đến Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}  # Sử dụng Buildx
+          push: true  # Đẩy image lên Docker Hub
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask-helloworld  # Tạo tag cho image
+          cache-from: type=local,src=/tmp/.buildx-cache  # Lấy cache từ build trước
+          cache-to: type=local,dest=/tmp/.buildx-cache  # Lưu cache để tối ưu build sau
 
-      - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Verify build digest
+        run: echo ${{ steps.docker_build.outputs.digest }}  # In ra digest để kiểm tra
