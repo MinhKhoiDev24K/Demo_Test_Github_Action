@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}  # Tên tài khoản Docker Hub
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}  # Token để xác thực
 
+# =================================================================================================
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3  # Cập nhật lên v3 để ổn định hơn
         id: buildx  # Định danh cho bước này
@@ -42,4 +43,4 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache  # Lưu cache để tối ưu build sau
 
       - name: Verify build digest
-        run: echo ${{ steps.docker_build.outputs.digest }}  # In ra digest để kiểm tra
+        run: echo ${{ steps.docker_build.outputs.digest }}  # In ra digest để kiểm tragit status
