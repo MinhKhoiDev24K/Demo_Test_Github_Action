@@ -29,6 +29,7 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}  # Tạo cache key theo commit SHA
           restore-keys: |
             ${{ runner.os }}-buildx-  # Phục hồi cache nếu có sẵn
+# ================================================================================================
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5  # Cập nhật lên v5
@@ -41,6 +42,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask-helloworld  # Tạo tag cho image
           cache-from: type=local,src=/tmp/.buildx-cache  # Lấy cache từ build trước
           cache-to: type=local,dest=/tmp/.buildx-cache  # Lưu cache để tối ưu build sau
-
+# =================================================================================================
       - name: Verify build digest
         run: echo ${{ steps.docker_build.outputs.digest }}  # In ra digest để kiểm tragit status
